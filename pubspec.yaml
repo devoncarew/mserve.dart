@@ -1,11 +1,11 @@
 name: mserve
 description: A small (micro) web server.
 version: 0.1.0
-author: <Devon Carew> <devoncarew@gmail.com>
+author: Devon Carew <devoncarew@gmail.com>
 homepage: https://github.com/devoncarew/mserve.dart
 
 environment:
-  sdk: '>=1.0.0 <2.0.0'
+  sdk: '>=1.8.0 <2.0.0'
 
 dependencies:
   args: ^0.13.0
