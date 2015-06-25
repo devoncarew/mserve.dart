@@ -7,15 +7,7 @@ A lightweight web server.
 
 ## Usage
 
-```
-mserve
-```
-
-or
-
-```
-mserve --port=80
-```
+Start with `mserve` or `mserve --port=80`.
 
 ## Features and bugs
 
