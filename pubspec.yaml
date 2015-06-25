@@ -1,0 +1,15 @@
+name: mserve
+description: A lightweight web server.
+version: 0.0.1
+author: <Devon Carew> <devoncarew@gmail.com>
+homepage: https://github.com/devoncarew/mserve.dart
+
+environment:
+  sdk: '>=1.0.0 <2.0.0'
+
+dependencies:
+  args: ^0.13.0
+  http_server: ^0.9.0
+
+dev_dependencies:
+  test: ^0.12.0
