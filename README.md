@@ -1,6 +1,6 @@
 # mserve
 
-A lightweight web server.
+A small (micro) web server.
 
 [![Build Status](https://travis-ci.org/devoncarew/mserve.dart.svg)](https://travis-ci.org/devoncarew/mserve.dart)
 [![pub package](https://img.shields.io/pub/v/mserve.svg)](https://pub.dartlang.org/packages/mserve)

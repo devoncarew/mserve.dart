@@ -1,7 +1,7 @@
 // Copyright (c) 2015, Devon Carew. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
-/// A lightweight web server.
+/// A small (micro) web server.
 library mserve;
 
 import 'dart:async';
@@ -9,7 +9,7 @@ import 'dart:io';
 
 import 'package:http_server/http_server.dart';
 
-/// A lightweight web server.
+/// A small (micro) web server.
 class MicroServer {
   static Future<MicroServer> start({String path, int port: 8000}) {
     if (path == null) path = '.';
@@ -29,7 +29,8 @@ class MicroServer {
     vDir.jailRoot = false;
 
     runZoned(() {
-      _server.listen(vDir.serveRequest,onError: (e) => _errorController.add(e));
+      _server.listen(vDir.serveRequest,
+          onError: (e) => _errorController.add(e));
     }, onError: (e) => _errorController.add(e));
   }
 
