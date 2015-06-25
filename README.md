@@ -2,6 +2,9 @@
 
 A lightweight web server.
 
+[![Build Status](https://travis-ci.org/devoncarew/mserve.dart.svg)](https://travis-ci.org/devoncarew/mserve.dart)
+[![pub package](https://img.shields.io/pub/v/mserve.svg)](https://pub.dartlang.org/packages/mserve)
+
 ## Usage
 
 ```
