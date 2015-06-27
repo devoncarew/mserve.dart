@@ -1,6 +1,6 @@
 name: mserve
 description: A small (micro) web server.
-version: 0.1.0
+version: 0.1.1
 author: Devon Carew <devoncarew@gmail.com>
 homepage: https://github.com/devoncarew/mserve.dart
 

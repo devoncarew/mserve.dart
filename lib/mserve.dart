@@ -11,11 +11,11 @@ import 'package:http_server/http_server.dart';
 
 /// A small (micro) web server.
 class MicroServer {
-  static Future<MicroServer> start({String path, int port: 8000}) {
+  static Future<MicroServer> start({String path, int port: 8000, bool log}) {
     if (path == null) path = '.';
 
     return HttpServer.bind('0.0.0.0', port).then((server) {
-      return new MicroServer._(path, server);
+      return new MicroServer._(path, server, log: log);
     });
   }
 
@@ -23,14 +23,21 @@ class MicroServer {
   final HttpServer _server;
   final StreamController _errorController = new StreamController.broadcast();
 
-  MicroServer._(this._path, this._server) {
+  MicroServer._(this._path, this._server, {bool log: false}) {
+    bool shouldLog = log == true;
+
     VirtualDirectory vDir = new VirtualDirectory(path);
     vDir.allowDirectoryListing = true;
     vDir.jailRoot = false;
 
     runZoned(() {
-      _server.listen(vDir.serveRequest,
-          onError: (e) => _errorController.add(e));
+      _server.listen((HttpRequest r) {
+        if (shouldLog) {
+          InternetAddress address = r.connectionInfo.remoteAddress;
+          print('[${address.host}] ${r.method} ${r.requestedUri}');
+        }
+        vDir.serveRequest(r);
+      }, onError: (e) => _errorController.add(e));
     }, onError: (e) => _errorController.add(e));
   }
 

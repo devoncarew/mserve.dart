@@ -14,6 +14,7 @@ void main(List<String> args) {
   parser.addOption('port',
       defaultsTo: '8000', abbr: 'p', help: 'the port to serve on');
   parser.addFlag('help', abbr: 'h', negatable: false, help: "show help");
+  parser.addFlag('log', negatable: false, help: "log requests");
 
   ArgResults results = parser.parse(args);
 
@@ -37,7 +38,8 @@ void main(List<String> args) {
     exit(1);
   });
 
-  MicroServer.start(path: dir, port: port).then((MicroServer server) {
+  MicroServer.start(path: dir, port: port, log: results['log']).then(
+      (MicroServer server) {
     print('Serving ${server.path} on ${server.urlBase}');
   });
 }
