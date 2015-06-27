@@ -38,8 +38,9 @@ void main(List<String> args) {
     exit(1);
   });
 
-  MicroServer.start(path: dir, port: port, log: results['log']).then(
-      (MicroServer server) {
+  MicroServer
+      .start(path: dir, port: port, log: results['log'])
+      .then((MicroServer server) {
     print('Serving ${server.path} on ${server.urlBase}');
   });
 }
