@@ -42,5 +42,8 @@ void main(List<String> args) {
       .start(path: dir, port: port, log: results['log'])
       .then((MicroServer server) {
     print('Serving ${server.path} on ${server.urlBase}');
+  }).catchError((e) {
+    print('Unable to start server.\n  (${e})');
+    exit(1);
   });
 }

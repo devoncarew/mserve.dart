@@ -34,7 +34,7 @@ class MicroServer {
       _server.listen((HttpRequest r) {
         if (shouldLog) {
           InternetAddress address = r.connectionInfo.remoteAddress;
-          print('[${address.host}] ${r.method} ${r.requestedUri}');
+          print('[from ${address.host}] ${r.method} ${r.requestedUri}');
         }
         vDir.serveRequest(r);
       }, onError: (e) => _errorController.add(e));
