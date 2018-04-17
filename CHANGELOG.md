@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- update our deps, and some updates for Dart 2
+
 ## 0.1.2
 
 - improved the error message when we're unable to bind to the requested port

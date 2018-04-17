@@ -33,10 +33,11 @@ void main(List<String> args) {
     dir = results.rest.first;
   }
 
-  int port = int.parse(results['port'], onError: (source) {
-    print('Unable to parse port parameter: ${source}.');
+  int port = int.tryParse(results['port']);
+  if (port == null) {
+    print('Unable to parse port parameter: ${results['port']}.');
     exit(1);
-  });
+  }
 
   MicroServer
       .start(path: dir, port: port, log: results['log'])

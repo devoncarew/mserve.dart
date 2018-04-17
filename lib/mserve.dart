@@ -28,7 +28,7 @@ class MicroServer {
 
     VirtualDirectory vDir = new VirtualDirectory(path);
     vDir.allowDirectoryListing = true;
-    vDir.jailRoot = false;
+    vDir.jailRoot = true;
 
     runZoned(() {
       _server.listen((HttpRequest r) {
