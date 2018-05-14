@@ -3,12 +3,13 @@
 
 library mserve.bin;
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:mserve/mserve.dart';
 
-void main(List<String> args) {
+Future main(List<String> args) async {
   ArgParser parser = new ArgParser();
 
   parser.addOption('port',
@@ -39,12 +40,20 @@ void main(List<String> args) {
     exit(1);
   }
 
-  MicroServer
-      .start(path: dir, port: port, log: results['log'])
-      .then((MicroServer server) {
+  try {
+    MicroServer server = await MicroServer.start(
+      path: dir,
+      port: port,
+      log: results['log'],
+    );
+
     print('Serving ${server.path} on ${server.urlBase}');
-  }).catchError((e) {
+
+    server.onError.listen((e) {
+      stderr.writeln('$e');
+    });
+  } catch (e) {
     print('Unable to start server.\n  (${e})');
     exit(1);
-  });
+  }
 }
