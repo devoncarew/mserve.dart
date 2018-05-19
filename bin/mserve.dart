@@ -7,6 +7,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:args/args.dart';
+import 'package:cli_util/cli_logging.dart';
 import 'package:mserve/mserve.dart';
 
 Future main(List<String> args) async {
@@ -14,10 +15,14 @@ Future main(List<String> args) async {
 
   parser.addOption('port',
       defaultsTo: '8000', abbr: 'p', help: 'the port to serve on');
-  parser.addFlag('help', abbr: 'h', negatable: false, help: "show help");
-  parser.addFlag('log', negatable: false, help: "log requests");
+  parser.addFlag('verbose', abbr: 'v', negatable: false, help: 'log requests');
+  parser.addFlag('help', abbr: 'h', negatable: false, help: 'show help');
 
   ArgResults results = parser.parse(args);
+  Ansi ansi = new Ansi(Ansi.terminalSupportsAnsi);
+  Logger logger = results['verbose']
+      ? new Logger.verbose(ansi: ansi)
+      : new Logger.standard(ansi: ansi);
 
   if (results['help']) {
     print('usage: mserve <options> <directory>');
@@ -44,16 +49,16 @@ Future main(List<String> args) async {
     MicroServer server = await MicroServer.start(
       path: dir,
       port: port,
-      log: results['log'],
+      logger: logger,
     );
 
-    print('Serving ${server.path} on ${server.urlBase}');
+    logger.stdout('Serving ${server.path} on ${server.urlBase}');
 
     server.onError.listen((e) {
-      stderr.writeln('$e');
+      logger.stderr('$e');
     });
   } catch (e) {
-    print('Unable to start server.\n  (${e})');
+    logger.stderr('Unable to start server.\n  (${e})');
     exit(1);
   }
 }

@@ -7,35 +7,37 @@ library mserve;
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cli_util/cli_logging.dart';
 import 'package:http_server/http_server.dart';
 
 /// A small (micro) web server.
 class MicroServer {
-  static Future<MicroServer> start({String path, int port: 8000, bool log}) {
-    if (path == null) path = '.';
+  static Future<MicroServer> start(
+      {String path, int port: 8000, Logger logger}) async {
+    if (path == null) {
+      path = '.';
+    }
 
-    return HttpServer.bind('0.0.0.0', port).then((server) {
-      return new MicroServer._(path, server, log: log);
-    });
+    logger ??= new Logger.standard();
+
+    HttpServer server = await HttpServer.bind('0.0.0.0', port);
+    return new MicroServer._(path, server, logger);
   }
 
   final String _path;
   final HttpServer _server;
+  final Logger _logger;
   final StreamController _errorController = new StreamController.broadcast();
 
-  MicroServer._(this._path, this._server, {bool log: false}) {
-    bool shouldLog = log == true;
-
+  MicroServer._(this._path, this._server, this._logger) {
     VirtualDirectory vDir = new VirtualDirectory(path);
     vDir.allowDirectoryListing = true;
     vDir.jailRoot = true;
 
     runZoned(() {
       _server.listen((HttpRequest r) {
-        if (shouldLog) {
-          InternetAddress address = r.connectionInfo.remoteAddress;
-          print('[from ${address.host}] ${r.method} ${r.requestedUri}');
-        }
+        InternetAddress address = r.connectionInfo.remoteAddress;
+        _logger.trace('${address.host} • ${r.method} ${r.requestedUri}');
         vDir.serveRequest(r);
       }, onError: (e) => _errorController.add(e));
     }, onError: (e) => _errorController.add(e));
