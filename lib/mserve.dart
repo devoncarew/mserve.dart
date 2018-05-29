@@ -8,50 +8,56 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cli_util/cli_logging.dart';
-import 'package:http_server/http_server.dart';
+import 'package:shelf/shelf.dart';
+import 'package:shelf/shelf_io.dart' as shelf_io;
+import 'package:shelf_static/shelf_static.dart' as shelf_static;
+
+import 'src/content_type.dart';
+import 'src/directories.dart';
+import 'src/logging.dart';
+import 'src/packages.dart';
+
+const int _kDefaultPort = 8000;
 
 /// A small (micro) web server.
 class MicroServer {
-  static Future<MicroServer> start(
-      {String path, int port: 8000, Logger logger}) async {
-    if (path == null) {
-      path = '.';
+  static Future<MicroServer> start({
+    String path,
+    int port: _kDefaultPort,
+    InternetAddress address,
+    Logger logger,
+  }) async {
+    path ??= Directory.current.path;
+    address ??= InternetAddress.loopbackIPv4;
+
+    Pipeline pipeline = const Pipeline();
+    if (logger != null) {
+      pipeline = pipeline.addMiddleware(logShelfRequests(logger));
     }
 
-    logger ??= new Logger.standard();
+    Cascade cascade = new Cascade()
+        .add(shelf_static.createStaticHandler(path,
+            contentTypeResolver: new CustomMimeTypeResolver()))
+        .add(createPackagesHandler(path))
+        .add(createDirectoriesHandler('mserve', path));
 
-    HttpServer server = await HttpServer.bind('0.0.0.0', port);
-    return new MicroServer._(path, server, logger);
+    Handler pipelineHandler = pipeline.addHandler(cascade.handler);
+    final HttpServer server =
+        await shelf_io.serve(pipelineHandler, address, port);
+    return new MicroServer(path, server, logger);
   }
 
-  final String _path;
-  final HttpServer _server;
-  final Logger _logger;
-  final StreamController _errorController = new StreamController.broadcast();
+  MicroServer(this.path, this.server, this.logger);
 
-  MicroServer._(this._path, this._server, this._logger) {
-    VirtualDirectory vDir = new VirtualDirectory(path);
-    vDir.allowDirectoryListing = true;
-    vDir.jailRoot = true;
+  final String path;
+  final HttpServer server;
+  final Logger logger;
 
-    runZoned(() {
-      _server.listen((HttpRequest r) {
-        InternetAddress address = r.connectionInfo.remoteAddress;
-        _logger.trace('${address.host} • ${r.method} ${r.requestedUri}');
-        vDir.serveRequest(r);
-      }, onError: (e) => _errorController.add(e));
-    }, onError: (e) => _errorController.add(e));
-  }
+  String get host => server.address.host;
 
-  String get host => _server.address.host;
-
-  String get path => _path;
-
-  int get port => _server.port;
+  int get port => server.port;
 
   String get urlBase => 'http://${host}:${port}/';
 
-  Stream get onError => _errorController.stream;
-
-  Future destroy() => _server.close();
+  Future destroy() => server.close();
 }

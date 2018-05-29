@@ -1,6 +1,6 @@
 name: mserve
 description: A small (micro) web server.
-version: 0.1.3
+version: 0.2.0
 author: Devon Carew <devoncarew@gmail.com>
 homepage: https://github.com/devoncarew/mserve.dart
 
@@ -10,7 +10,12 @@ environment:
 dependencies:
   args: ^1.0.0
   cli_util: ^0.1.3
+  http_parser: ^3.0.0
   http_server: ^0.9.0
+  mime: ^0.9.6
+  package_config: ^1.0.3
+  shelf: ^0.7.2
+  shelf_static: ^0.2.0
 
 dev_dependencies:
   test: ^0.12.0
