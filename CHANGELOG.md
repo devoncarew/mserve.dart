@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0
+
+- change the utility to be package:shelf based
+
 ## 0.1.3
 
 - update our deps, and some updates for Dart 2

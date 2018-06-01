@@ -3,14 +3,13 @@
 
 library mserve.bin;
 
-import 'dart:async';
 import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:cli_util/cli_logging.dart';
 import 'package:mserve/mserve.dart';
 
-Future main(List<String> args) async {
+void main(List<String> args) async {
   ArgParser parser = new ArgParser();
 
   parser.addOption('port',
@@ -53,10 +52,6 @@ Future main(List<String> args) async {
     );
 
     logger.stdout('Serving ${server.path} on ${server.urlBase}');
-
-    server.onError.listen((e) {
-      logger.stderr('$e');
-    });
   } catch (e) {
     logger.stderr('Unable to start server.\n  (${e})');
     exit(1);
