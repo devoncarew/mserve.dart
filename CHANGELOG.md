@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1
+
+- update the styles for the directory listings to use
+  [Github's Primer](primer.github.io)
+
 ## 0.2.0
 
 - change the utility to be package:shelf based
