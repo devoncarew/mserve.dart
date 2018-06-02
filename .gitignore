@@ -4,6 +4,7 @@
 .pub/
 .dart_tool/
 build/
+doc/api/
 packages
 pubspec.lock
 .packages
