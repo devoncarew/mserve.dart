@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:intl/intl.dart';
 import 'package:path/path.dart' as path;
 import 'package:shelf/shelf.dart';
 
@@ -48,41 +49,72 @@ String _getHeader(String appName, String sanitizedHeading) {
   return '''<!DOCTYPE html>
 <html>
 <head>
-  <title>$appName $sanitizedHeading</title>
+  <title>[$appName] $sanitizedHeading</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/6.0.0/build.css">
   <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-  }
-  body {
-    font-family: sans-serif;
-  }
-  h1 {
-    background-color: #607D8B;
-    color: white;
-    font-weight: normal;
-    margin: 0 0 10px 0;
-    padding: 16px 32px;
-    white-space: nowrap;
-  }
-  ul {
-    margin: 0;
-  }
-  li {
-    padding: 0;
-  }
-  a {
-    line-height: 1.4em;
-  }
+.masthead {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  background-color: #4078c0;
+  color: #fff;
+}
+.footer {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  margin-top: 2rem;
+  line-height: 1.75;
+  color: #7a7a7a;
+  border-top: 1px solid #eee;
+}
+li {
+  display: block;
+}
+.wide {
+  min-width: 300px;
+  display: inline-block;
+}
+.medium {
+  min-width: 220px;
+  display: inline-block;
+}
+.narrow {
+  min-width: 120px;
+  display: inline-block;
+}
+.right {
+  text-align: right;
+}
+.fixed {
+  font-family: monospace;
+  padding-left: 10px;
+}
   </style>
 </head>
 <body>
-  <h1>$appName $sanitizedHeading</h1>
-  <ul>
+<header class="masthead">
+  <div class="container">
+    <h2>$sanitizedHeading</h2>
+  </div>
+</header>
+  <div class="container">
+    <ul>
 ''';
 }
 
-const String _trailer = '</ul></body></html>';
+String getTrailer(int fileCount) {
+  return '''
+</ul>
+</div>
+<div class="container">
+<footer class="footer right">
+  $fileCount ${fileCount == 1 ? 'file' : 'files'}
+</footer>
+</div>
+</body>
+</html>
+''';
+}
 
 Response listDirectory(String appName, String fileSystemPath, String dirPath) {
   StreamController<List<int>> controller = new StreamController<List<int>>();
@@ -115,16 +147,25 @@ Response listDirectory(String appName, String fileSystemPath, String dirPath) {
       return e1.path.compareTo(e2.path);
     });
 
+    NumberFormat nf = new NumberFormat.decimalPattern();
+
     for (FileSystemEntity entity in entities) {
       String name = path.relative(entity.path, from: dirPath);
       if (entity is Directory) {
         name += '/';
       }
       String sanitizedName = sanitizer.convert(name);
-      add('<li><a href="$sanitizedName">$sanitizedName</a></li>\n');
+      String fileSize = entity is File ? nf.format(entity.lengthSync()) : '';
+      String date = entity.statSync().modified.toString();
+
+      add('<li>');
+      add('<span class="wide"><a href="$sanitizedName">$sanitizedName</a></span>');
+      add('<span class="narrow right fixed">$fileSize</span>');
+      add('<span class="medium right fixed">$date</span>');
+      add('</li>\n');
     }
 
-    add(_trailer);
+    add(getTrailer(entities.length));
     controller.close();
   });
 
