@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2
+
+- updates for Dart 2
+
 ## 0.2.1
 
 - update the styles for the directory listings to use

@@ -104,13 +104,13 @@ Future<Response> _handleFile(Request request, File file) async {
   }
 
   var headers = {
-    HttpHeaders.CONTENT_LENGTH: stat.size.toString(),
-    HttpHeaders.LAST_MODIFIED: formatHttpDate(stat.changed)
+    HttpHeaders.contentLengthHeader: stat.size.toString(),
+    HttpHeaders.lastModifiedHeader: formatHttpDate(stat.changed)
   };
 
   String contentType = _mimeTypeResolver.lookup(file.path);
   if (contentType != null) {
-    headers[HttpHeaders.CONTENT_TYPE] = contentType;
+    headers[HttpHeaders.contentTypeHeader] = contentType;
   }
 
   return new Response.ok(file.openRead(), headers: headers);
