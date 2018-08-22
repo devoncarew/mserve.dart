@@ -75,14 +75,16 @@ String _getMessage(
 }
 
 String _getErrorMessage(
-    Uri requestedUri, String method, Object error, StackTrace stack) {
-  StackTrace chain = StackTrace.current;
-
+  Uri requestedUri,
+  String method,
+  Object error, [
+  StackTrace stack,
+]) {
   String msg = '$method\t${requestedUri.path}'
       '${_formatQuery(requestedUri.query)}\n$error';
-  if (chain == null) return msg;
+  if (stack == null) return msg;
 
-  return '$msg\n$chain';
+  return '$msg\n$stack';
 }
 
 String _formatQuery(String query) {

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.3
+
+- fixes for serving DDC compiled content
+
 ## 0.2.2
 
 - updates for Dart 2
