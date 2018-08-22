@@ -28,11 +28,12 @@ Handler createPackagesHandler(String rootPath) {
     }
 
     int index = segments.lastIndexOf('packages');
-    if (index == 0 || index + 2 >= segments.length) {
+    if (index + 2 >= segments.length) {
       return new Response.notFound('Not Found');
     }
 
-    List<String> baseSegments = segments.sublist(0, index - 1);
+    List<String> baseSegments =
+        index == 0 ? [] : segments.sublist(0, index - 1);
     String packageName = segments[index + 1];
     List<String> relativeSegments = segments.sublist(index + 2);
     if (relativeSegments.contains('..')) {
@@ -76,13 +77,20 @@ Handler createPackagesHandler(String rootPath) {
       return new Response.notFound('Not Found');
     }
 
-    if (!packageMap.containsKey(packageName)) {
-      return new Response.notFound('Not Found');
-    }
+    Uri packageUri;
 
-    Uri packageUri = packageMap[packageName];
-    if (packageUri.scheme != 'file') {
-      return new Response.notFound('Not Found');
+    if (packageName == r'$sdk') {
+      Uri uri = Uri.file(Platform.resolvedExecutable);
+      packageUri = uri.resolve('../lib/');
+    } else {
+      if (!packageMap.containsKey(packageName)) {
+        return new Response.notFound('Not Found');
+      }
+
+      packageUri = packageMap[packageName];
+      if (packageUri.scheme != 'file') {
+        return new Response.notFound('Not Found');
+      }
     }
 
     Uri resolvedUri = packageUri.resolve(relativeSegments.join('/'));
@@ -93,7 +101,11 @@ Handler createPackagesHandler(String rootPath) {
 final MimeTypeResolver _mimeTypeResolver = new MimeTypeResolver();
 
 Future<Response> _handleFile(Request request, File file) async {
-  var stat = file.statSync();
+  FileStat stat = file.statSync();
+  if (stat.type == FileSystemEntityType.notFound) {
+    return new Response.notFound('Not Found');
+  }
+
   var ifModifiedSince = request.ifModifiedSince;
 
   if (ifModifiedSince != null) {
@@ -105,7 +117,8 @@ Future<Response> _handleFile(Request request, File file) async {
 
   var headers = {
     HttpHeaders.contentLengthHeader: stat.size.toString(),
-    HttpHeaders.lastModifiedHeader: formatHttpDate(stat.changed)
+    HttpHeaders.lastModifiedHeader:
+        formatHttpDate(stat.changed ?? DateTime.now())
   };
 
   String contentType = _mimeTypeResolver.lookup(file.path);
